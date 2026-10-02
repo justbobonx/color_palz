@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Color Palz</title>
+  <title>color palz</title>
   <style>
     body {
       font-family: system-ui, sans-serif;
-      font-size: 24px;
-      margin: 36px;
+      font-size: 20px;
+      margin: 18px;
       background: #1a1a1a;
       color: #eee;
     }
@@ -22,9 +22,9 @@
     .add {
       justify-self: start;
       align-self: end;
-      width: 63px;
-      height: 63px;
-      font-size: 33px;
+      width: 62px;
+      height: 62px;
+      font-size: 30px;
       line-height: 1;
     }
     h1 { font-size: 1.65rem; font-weight: 500; margin: 0 0 18px; }
@@ -48,7 +48,7 @@
       border-color: #ccc;
     }
     button { padding: 9px 18px; cursor: pointer; }
-    button:hover { outline: 2px solid #666; outline-offset: 2px; }
+    button:hover { outline: 1px solid #666; outline-offset: 1px; }
     button:active { outline-color: #aaa; }
     body.light button:hover { outline-color: #999; }
     .hint { font-size: 18px; color: #888; }
@@ -121,15 +121,15 @@
     .swatch.open .controls { display: grid; }
     .controls button {
       padding: 12px 3px;
-      font-size: 16px;
+      font-size: 18px;
       font-family: ui-monospace, monospace;
       border: 1px solid transparent;
       text-shadow: none;
     }
     .controls button:hover,
     .controls button:active {
-      outline: 3px solid #eee;
-      outline-offset: -3px;
+      outline: 2px solid #eee;
+      outline-offset: -2px;
       filter: none;
     }
     body.light .controls button:hover,
@@ -151,9 +151,9 @@
     }
     #ioCopy {
       position: absolute;
-      right: 12px;
-      bottom: 12px;
-      padding: 6px 12px;
+      right: 14px;
+      bottom: 24px;
+      padding: 6px 10px;
       font-size: 18px;
     }
     .err { color: #d88; font-size: 20px; margin-top: 9px; min-height: 1em; }
@@ -161,14 +161,16 @@
 </head>
 <body>
   <div class="top">
-    <h1>Color Palz</h1>
+    <h1>color palz</h1>
     <div class="theme-bar">
       <button id="newBtn" type="button">New</button>
       <button id="themeBtn" type="button">Light</button>
     </div>
   </div>
   <div class="bar">
-    <span class="hint">paste a list to load it · drag a chip to reorder · click to adjust · shift halves · ctrl is 2 / 1 / 1</span>
+    <span class="hint">paste a list to load it (can be any code/text with a color list in it) · 
+    changes live edit · drag to reorder · 
+    click to adjust HSL · shift half inc · ctrl fine inc</span>
   </div>
   <div class="io" id="io">
     <textarea id="ioText" spellcheck="false"></textarea>
@@ -376,13 +378,14 @@
     }
 
     function freshList() {
+      const count = colors.length || 12;
       const family = {
         hue: Math.random() * 360,
-        step: 28 + Math.random() * 22,
+        step: 360 / count,
         sat: 35 + Math.random() * 55,
         lev: 32 + Math.random() * 32,
       };
-      colors = Array.from({ length: 12 }, (_, i) => randomColor(i, family));
+      colors = Array.from({ length: count }, (_, i) => randomColor(i, family));
       sourceText = "";
       openIndex = -1;
       ioErr.textContent = "";
