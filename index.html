@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>colorz</title>
+  <title>Color Palz</title>
   <style>
     body {
       font-family: system-ui, sans-serif;
@@ -161,7 +161,7 @@
 </head>
 <body>
   <div class="top">
-    <h1>colorz</h1>
+    <h1>Color Palz</h1>
     <div class="theme-bar">
       <button id="newBtn" type="button">New</button>
       <button id="themeBtn" type="button">Light</button>
@@ -358,7 +358,8 @@
       add.textContent = "+";
       add.title = "Add a color";
       add.addEventListener("click", () => {
-        colors.push(randomColor(colors.length));
+        const seed = colors.length ? hexToHsl(colors[0]) : { h: Math.random() * 360, s: 55, l: 48 };
+        colors.push(randomColor(colors.length, { hue: seed.h, step: 37, sat: seed.s, lev: seed.l }));
         sourceText = "";
         openIndex = colors.length - 1;
         render();
@@ -367,12 +368,21 @@
       grid.appendChild(add);
     }
 
-    function randomColor(i) {
-      return hslToHex((i * 47 + Math.random() * 24) % 360, 28 + Math.random() * 22, 32 + Math.random() * 18);
+    function randomColor(i, family) {
+      const hue = (family.hue + i * family.step + (Math.random() - 0.5) * 18 + 360) % 360;
+      const sat = clamp(family.sat + (Math.random() - 0.5) * 12, 8, 100);
+      const lev = clamp(family.lev + (Math.random() - 0.5) * 10, 18, 82);
+      return hslToHex(hue, sat, lev);
     }
 
     function freshList() {
-      colors = Array.from({ length: 12 }, (_, i) => randomColor(i));
+      const family = {
+        hue: Math.random() * 360,
+        step: 28 + Math.random() * 22,
+        sat: 35 + Math.random() * 55,
+        lev: 32 + Math.random() * 32,
+      };
+      colors = Array.from({ length: 12 }, (_, i) => randomColor(i, family));
       sourceText = "";
       openIndex = -1;
       ioErr.textContent = "";
@@ -391,14 +401,17 @@
     function loadState() {
       try {
         const saved = JSON.parse(localStorage.getItem("color-list-editor") || "null");
-        if (!saved || !Array.isArray(saved.colors) || !saved.colors.length) return;
+        if (!saved || !Array.isArray(saved.colors) || !saved.colors.length) return false;
         colors = saved.colors;
         sourceText = saved.sourceText || "";
         if (saved.light) {
           document.body.classList.add("light");
           document.getElementById("themeBtn").textContent = "Dark";
         }
-      } catch {}
+        return true;
+      } catch {
+        return false;
+      }
     }
 
     function syncBox() {
@@ -439,7 +452,7 @@
     };
     document.getElementById("newBtn").onclick = freshList;
 
-    loadState();
+    const restored = loadState();
 
     function setStepMode(next) {
       if (next === stepMode) return;
@@ -456,8 +469,11 @@
     });
     window.addEventListener("blur", () => setStepMode("normal"));
 
-    syncBox();
-    render();
+    if (!restored) freshList();
+    else {
+      syncBox();
+      render();
+    }
   </script>
 </body>
 </html>
